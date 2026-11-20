@@ -33,6 +33,8 @@ public:
     const std::vector<Block>& getBlocks() const noexcept { return blocks; }
 
 private:
+    bool hasValidState() const;
+
     // Blocos de tamanho positivo, em ordem, cobrindo [0, capacity).
     std::vector<Block> blocks;
     int capacity = 0;
