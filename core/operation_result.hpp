@@ -65,7 +65,7 @@ struct StepResult {
     std::vector<MovedBlock> moved;
     int moved_bytes = 0; // Número de blocos movidos = moved.size().
 
-    bool ok() const noexcept { return !error.has_value(); }
+    bool isOk() const noexcept { return !error.has_value(); }
 };
 
 using StatsResult = std::variant<Stats, OperationError>;

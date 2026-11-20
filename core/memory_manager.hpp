@@ -21,24 +21,24 @@ public:
     // Falhas preservam o estado inteiro, incluindo o ponteiro e a sequência de IDs.
     StepResult init(int size);
     StepResult alloc(int size, FitAlg algorithm);
-    StepResult free_id(std::uint64_t id);
-    StepResult free_addr(int addr);
+    StepResult freeId(std::uint64_t id);
+    StepResult freeAddr(int addr);
     StepResult defrag(DefragOption option);
-    StatsResult stats() const;
+    StatsResult getStats() const;
 
     // Capacidade zero representa o estado anterior ao primeiro init.
-    bool initialized() const noexcept { return capacity_ > 0; }
-    int capacity() const noexcept { return capacity_; }
-    int next_pointer() const noexcept { return next_pointer_; }
-    const std::vector<Block>& blocks() const noexcept { return blocks_; }
+    bool isInitialized() const noexcept { return capacity > 0; }
+    int getCapacity() const noexcept { return capacity; }
+    int getNextPointer() const noexcept { return next_pointer; }
+    const std::vector<Block>& getBlocks() const noexcept { return blocks; }
 
 private:
-    // Blocos de tamanho positivo, em ordem, cobrindo [0, capacity_).
-    std::vector<Block> blocks_;
-    int capacity_ = 0;
-    int next_pointer_ = 0;
+    // Blocos de tamanho positivo, em ordem, cobrindo [0, capacity).
+    std::vector<Block> blocks;
+    int capacity = 0;
+    int next_pointer = 0;
     // Testar o máximo antes de somar. Zero significa que nenhum ID foi emitido.
-    std::uint64_t last_issued_id_ = 0;
+    std::uint64_t last_issued_id = 0;
 };
 
 } // namespace memsim

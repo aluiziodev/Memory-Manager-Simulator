@@ -49,7 +49,7 @@ struct MemoryView {
 using CommandResult = std::variant<StepResult, MemoryView, Stats, OperationError>;
 
 // show e stats são comandos válidos. O filtro visual é aplicado após o parse.
-ParseResult parse_line(std::string_view text, std::size_t line_number);
+ParseResult parseLine(std::string_view text, std::size_t line_number);
 // Mutações retornam StepResult. Erros de show/stats retornam OperationError.
 CommandResult execute(MemoryManager& memory, const Command& command);
 

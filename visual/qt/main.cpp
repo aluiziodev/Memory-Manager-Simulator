@@ -19,7 +19,7 @@ namespace {
 
 using Frame = std::array<memsim::Block, 3>;
 constexpr int capacity = 32;
-constexpr int intervalMs = 500;
+constexpr int interval_ms = 500;
 
 // Estados fixos para validar o desenho e o temporizador antes de integrar o núcleo.
 constexpr std::array<Frame, 3> frames{{
@@ -37,7 +37,7 @@ public:
 
     void setFrame(std::size_t frame)
     {
-        frame_ = frame;
+        current_frame = frame;
         update();
     }
 
@@ -48,19 +48,19 @@ protected:
         constexpr int margin = 12;
         constexpr int top = 10;
         constexpr int height = 54;
-        const double pixelsPerByte = (width() - 2 * margin) / double(capacity);
+        const double pixels_per_byte = (width() - 2 * margin) / double(capacity);
 
-        for (const auto& block : frames[frame_]) {
-            const QRectF rect(margin + block.start * pixelsPerByte, top,
-                              block.size * pixelsPerByte, height);
-            const QColor color = block.is_free()
+        for (const auto& block : frames[current_frame]) {
+            const QRectF rect(margin + block.start * pixels_per_byte, top,
+                              block.size * pixels_per_byte, height);
+            const QColor color = block.isFree()
                 ? QColor(Qt::lightGray)
                 : QColor::fromHsv(static_cast<int>(block.id % 360) * 137 % 360, 140, 225);
-            painter.setBrush(block.is_free() ? QBrush(color, Qt::Dense4Pattern)
+            painter.setBrush(block.isFree() ? QBrush(color, Qt::Dense4Pattern)
                                            : QBrush(color));
             painter.setPen(Qt::black);
             painter.drawRect(rect);
-            const QString label = block.is_free()
+            const QString label = block.isFree()
                 ? QStringLiteral("Livre\n%1 B").arg(block.size)
                 : QStringLiteral("ID %1\n%2 B").arg(static_cast<qulonglong>(block.id)).arg(block.size);
             painter.drawText(rect, Qt::AlignCenter, label);
@@ -73,7 +73,7 @@ protected:
     }
 
 private:
-    std::size_t frame_ = 0;
+    std::size_t current_frame = 0;
 };
 
 class Prototype : public QWidget {
@@ -88,30 +88,30 @@ public:
         auto* play = new QPushButton(QStringLiteral("Reproduzir exemplo"), this);
         auto* pause = new QPushButton(QStringLiteral("Pausar"), this);
 
-        preview_.setReadOnly(true);
-        preview_.setPlaceholderText(QStringLiteral("Conteúdo do roteiro selecionado"));
+        preview.setReadOnly(true);
+        preview.setPlaceholderText(QStringLiteral("Conteúdo do roteiro selecionado"));
 
         layout->addWidget(open);
-        layout->addWidget(&preview_);
-        layout->addWidget(&status_);
-        layout->addWidget(&map_);
+        layout->addWidget(&preview);
+        layout->addWidget(&status);
+        layout->addWidget(&map);
         layout->addWidget(play);
         layout->addWidget(pause);
 
-        timer_.setInterval(intervalMs);
-        connect(&timer_, &QTimer::timeout, this, [this] {
-            showFrame(frame_ + 1);
-            if (frame_ == frames.size() - 1) {
-                timer_.stop();
-                if (smokeTest_) {
+        timer.setInterval(interval_ms);
+        connect(&timer, &QTimer::timeout, this, [this] {
+            showFrame(current_frame + 1);
+            if (current_frame == frames.size() - 1) {
+                timer.stop();
+                if (smoke_test) {
                     QApplication::exit(EXIT_SUCCESS);
                 }
             }
         });
         connect(play, &QPushButton::clicked, this, [this] { playExample(); });
-        connect(pause, &QPushButton::clicked, &timer_, &QTimer::stop);
+        connect(pause, &QPushButton::clicked, &timer, &QTimer::stop);
         connect(open, &QPushButton::clicked, this, [this] {
-            timer_.stop();
+            timer.stop();
             const QString path = QFileDialog::getOpenFileName(
                 this, QStringLiteral("Abrir roteiro"), {},
                 QStringLiteral("Roteiros (*.cmd);;Todos os arquivos (*)"));
@@ -127,10 +127,10 @@ public:
     bool runSmokeTest(const QString& path)
     {
         if (!loadScript(path) ||
-            preview_.toPlainText().split(QLatin1Char('\n')).value(0) != QStringLiteral("init 32")) {
+            preview.toPlainText().split(QLatin1Char('\n')).value(0) != QStringLiteral("init 32")) {
             return false;
         }
-        smokeTest_ = true;
+        smoke_test = true;
         playExample();
         return true;
     }
@@ -146,31 +146,31 @@ private:
         if (file.error() != QFileDevice::NoError) {
             return false;
         }
-        preview_.setPlainText(QString::fromUtf8(contents));
+        preview.setPlainText(QString::fromUtf8(contents));
         return true;
     }
 
     void playExample()
     {
         showFrame(0);
-        timer_.start();
+        timer.start();
     }
 
     void showFrame(std::size_t frame)
     {
-        frame_ = frame;
-        map_.setFrame(frame_);
-        status_.setText(QStringLiteral("Demonstração fixa · Estado %1 de %2 · Intervalo de 500 ms")
-                            .arg(frame_ + 1)
+        current_frame = frame;
+        map.setFrame(current_frame);
+        status.setText(QStringLiteral("Demonstração fixa · Estado %1 de %2 · Intervalo de 500 ms")
+                            .arg(current_frame + 1)
                             .arg(frames.size()));
     }
 
-    QPlainTextEdit preview_;
-    QLabel status_;
-    MemoryMap map_;
-    QTimer timer_;
-    std::size_t frame_ = 0;
-    bool smokeTest_ = false;
+    QPlainTextEdit preview;
+    QLabel status;
+    MemoryMap map;
+    QTimer timer;
+    std::size_t current_frame = 0;
+    bool smoke_test = false;
 };
 
 } // namespace

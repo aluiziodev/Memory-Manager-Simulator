@@ -10,10 +10,10 @@ struct Block {
     int size;
     std::uint64_t id; // Zero identifica um buraco.
 
-    constexpr bool is_free() const noexcept { return id == 0; }
+    constexpr bool isFree() const noexcept { return id == 0; }
 
     // O limite é exclusivo. A soma usa um tipo mais largo que os endereços.
-    constexpr std::int64_t end() const noexcept
+    constexpr std::int64_t getEnd() const noexcept
     {
         return static_cast<std::int64_t>(start) + size;
     }
