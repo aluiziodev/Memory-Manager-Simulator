@@ -1,3 +1,5 @@
+#include "core/block.hpp"
+
 #include <QApplication>
 #include <QFile>
 #include <QFileDialog>
@@ -15,13 +17,7 @@
 
 namespace {
 
-struct Block {
-    int start;
-    int size;
-    int id;
-};
-
-using Frame = std::array<Block, 3>;
+using Frame = std::array<memsim::Block, 3>;
 constexpr int capacity = 32;
 constexpr int intervalMs = 500;
 
@@ -57,16 +53,16 @@ protected:
         for (const auto& block : frames[frame_]) {
             const QRectF rect(margin + block.start * pixelsPerByte, top,
                               block.size * pixelsPerByte, height);
-            const QColor color = block.id == 0
+            const QColor color = block.is_free()
                 ? QColor(Qt::lightGray)
-                : QColor::fromHsv((block.id * 137) % 360, 140, 225);
-            painter.setBrush(block.id == 0 ? QBrush(color, Qt::Dense4Pattern)
+                : QColor::fromHsv(static_cast<int>(block.id % 360) * 137 % 360, 140, 225);
+            painter.setBrush(block.is_free() ? QBrush(color, Qt::Dense4Pattern)
                                            : QBrush(color));
             painter.setPen(Qt::black);
             painter.drawRect(rect);
-            const QString label = block.id == 0
+            const QString label = block.is_free()
                 ? QStringLiteral("Livre\n%1 B").arg(block.size)
-                : QStringLiteral("ID %1\n%2 B").arg(block.id).arg(block.size);
+                : QStringLiteral("ID %1\n%2 B").arg(static_cast<qulonglong>(block.id)).arg(block.size);
             painter.drawText(rect, Qt::AlignCenter, label);
         }
 

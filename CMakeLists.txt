@@ -6,6 +6,7 @@ option(MEMSIM_BUILD_VISUAL "Build the Qt Widgets prototype" OFF)
 
 add_library(memsim-core STATIC core/memory_manager.cpp)
 target_compile_features(memsim-core PUBLIC cxx_std_17)
+target_include_directories(memsim-core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable(memsim cli/main.cpp)
 target_link_libraries(memsim PRIVATE memsim-core)
@@ -13,7 +14,9 @@ target_link_libraries(memsim PRIVATE memsim-core)
 include(CTest)
 if(BUILD_TESTING)
     add_test(NAME cli_smoke COMMAND memsim)
-    set_tests_properties(cli_smoke PROPERTIES PASS_REGULAR_EXPRESSION "F01")
+    set_tests_properties(cli_smoke PROPERTIES
+        PASS_REGULAR_EXPRESSION "Simulador de gerenciamento de memoria"
+    )
 endif()
 
 if(MEMSIM_BUILD_VISUAL)
