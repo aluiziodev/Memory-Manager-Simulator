@@ -44,6 +44,7 @@ A cuida do núcleo, B da CLI e do build, C da visualização, seguindo os papéi
 ### Fundação
 
 - [ ] **F01 · Build e prova da interface visual** · B e C · sem dependências. B cria `CMakeLists.txt` com biblioteca do núcleo, CLI e CTest. Adicionar a opção `MEMSIM_BUILD_VISUAL` (padrão `OFF`). Quando ligada, localizar `Qt6` com o componente `Widgets` e vincular `Qt6::Widgets` ao executável `memsim-visual`. C monta um protótipo que abre um `.cmd`, desenha três blocos e alterna estados de exemplo a cada 500 ms. **Aceite:** CLI e testes compilam com a opção desligada, inclusive em ambiente sem Qt. Com a opção ligada, o protótipo compila e roda nas máquinas disponíveis da equipe. Registrar os pré-requisitos e comandos validados.
+  - Validação local em Linux com GCC 11, CMake 3.22 e Qt 6.2.4. CTest passou com a interface desabilitada e com o protótipo executado via plugin `offscreen`. A conferência do seletor em janela e a execução nas demais máquinas da equipe ficam para a homologação do protótipo.
 - [ ] **F02 · Definir tipos e interfaces compartilhados** · A, com revisão de B e C · sem dependências. Registrar assinaturas, tipos de dados e retorno por operação, incluindo estado pré-init e erros. Definir cálculo de endereços dentro da capacidade e contador de IDs com faixa segura, evitando overflow ou reciclagem. **Aceite:** declarações compilam e cada frente consegue construir um comando e ler um resultado de exemplo sem depender dos detalhes internos.
 
 ### Núcleo
