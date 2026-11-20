@@ -88,6 +88,111 @@ A cuida do núcleo, B da CLI e do build, C da visualização, seguindo os papéi
 | OPT no interior | Em 24 bytes, alocar 4, 2, 4, 2, 12 e liberar IDs 2 e 4 | OPT escolhe `k=2`, move ID 3 de @6 para @4 e mantém IDs 1 e 5 em @0 e @12. Buraco @8 +4. Custos INIT 8 B, END 16 B, OPT 4 B. |
 | Estado visual | Em roteiro, `init 16`, `alloc 8 first`, `alloc 12 next` (erro), `init 10`, `alloc 2 next`. Inserir `show` e `stats` após o erro | Cinco passos visuais. Ao voltar do segundo `init`, reaparecem erro, ID 1 @0 +8 e ponteiro 8. A CLI executa as consultas. Reiniciar volta ao estado anterior ao primeiro comando. |
 
+## Grafo de dependências
+
+Uma seta contínua vai do pré-requisito à tarefa que depende dele para concluir. Para facilitar a leitura, o grafo omite dependências já cobertas por um caminho de setas. A seta pontilhada indica quando D01 pode começar. Sua conclusão depende de Q02.
+
+```mermaid
+flowchart LR
+    subgraph Base["Fundação"]
+        F01["F01 · Build e protótipo Qt"]
+        F02["F02 · Contratos compartilhados"]
+    end
+
+    subgraph Core["Núcleo"]
+        C01["C01 · Estado e init"]
+        C02["C02 · Estatísticas e liberação"]
+        C03["C03 · First, Best e Worst"]
+        C04["C04 · Next Fit"]
+        C05["C05 · Compactação"]
+    end
+
+    subgraph CLI["CLI e roteiros"]
+        L01["L01 · Parser"]
+        L02["L02 · Formatação"]
+        L03["L03 · Executável CLI"]
+    end
+
+    subgraph Visual["Simulação visual"]
+        V01["V01 · Seletor e histórico"]
+        V02["V02 · Mapa e escala"]
+        V03["V03 · Painel e destaques"]
+        V04["V04 · Reprodução e pausa"]
+    end
+
+    subgraph Entrega["Validação e entrega"]
+        Q01["Q01 · Testes automatizados"]
+        Q02["Q02 · Integração visual"]
+        D01["D01 · Documento e comentários"]
+        D02["D02 · README e homologação"]
+    end
+
+    F02 --> C01 --> C02 --> C03 --> C04
+    C02 --> C05
+    F02 --> L01
+    C02 --> L02
+    F01 --> L03
+    C03 --> L03
+    L01 --> L03
+    L02 --> L03
+
+    L01 --> V01
+    F01 --> V02
+    F02 --> V02
+    C04 --> V03
+    C05 --> V03
+    V01 --> V03
+    V02 --> V03
+    V01 --> V04
+
+    C04 --> Q01
+    C05 --> Q01
+    L03 --> Q01
+    L03 --> Q02
+    V03 --> Q02
+    V04 --> Q02
+    F02 -. pode começar .-> D01
+    Q02 --> D01
+    Q01 --> D02
+    D01 --> D02
+```
+
+### Versão em texto
+
+Em cada linha, leia `tarefa <- pré-requisitos`. O sinal `+` indica que todos os pré-requisitos listados precisam estar concluídos. Dependências indiretas aparecem ao seguir os IDs nas demais linhas.
+
+```text
+Fundação
+  F01 · Build e protótipo Qt  <-  sem pré-requisitos
+  F02 · Contratos compartilhados  <-  sem pré-requisitos
+
+Núcleo
+  C01 · Estado e init  <-  F02
+  C02 · Estatísticas e liberação  <-  C01
+  C03 · First, Best e Worst  <-  C02
+  C04 · Next Fit  <-  C03
+  C05 · Compactação  <-  C02
+
+CLI e roteiros
+  L01 · Parser  <-  F02
+  L02 · Formatação  <-  C02
+  L03 · Executável CLI  <-  C03 + F01 + L01 + L02
+
+Simulação visual
+  V01 · Seletor e histórico  <-  L01
+  V02 · Mapa e escala  <-  F01 + F02
+  V03 · Painel e destaques  <-  C04 + C05 + V01 + V02
+  V04 · Reprodução e pausa  <-  V01
+
+Validação e entrega
+  Q01 · Testes automatizados  <-  C04 + C05 + L03
+  Q02 · Integração visual  <-  L03 + V03 + V04
+  D01 · Documento e comentários  <-  Q02
+  D02 · README e homologação  <-  D01 + Q01
+```
+
+D01 pode começar após F02 e ser concluída após Q02.
+
 ## Ordem de execução
 
 1. **Começar por F01 e F02.** B inicia o build, A especifica os tipos e C faz o protótipo visual. Assim que F02 estiver disponível, B inicia L01 e C prepara o mapa com dados de exemplo.
