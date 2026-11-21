@@ -27,6 +27,7 @@ enum class ErrorCode {
     InvalidBlockStart,
     NoContiguousSpace,
     IdExhausted,
+    UnsupportedAlgorithm,
 };
 
 struct SpaceShortage {
