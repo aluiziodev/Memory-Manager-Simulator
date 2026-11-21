@@ -40,7 +40,7 @@ struct ParseError {
 
 using ParseResult = std::variant<Command, IgnoredLine, ParseError>;
 
-// View por valor para preservar o resultado entre passos.
+// Representação por valor para preservar o resultado entre os passos.
 struct MemoryView {
     std::vector<Block> blocks;
     Stats stats;
@@ -48,7 +48,7 @@ struct MemoryView {
 
 using CommandResult = std::variant<StepResult, MemoryView, Stats, OperationError>;
 
-// show e stats são comandos válidos. O filtro visual é aplicado após o parse.
+// show e stats são comandos válidos. O filtro visual é aplicado após a análise sintática.
 ParseResult parseLine(std::string_view text, std::size_t line_number);
 // Mutações retornam StepResult. Erros de show/stats retornam OperationError.
 CommandResult execute(MemoryManager& memory, const Command& command);
