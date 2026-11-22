@@ -1,4 +1,4 @@
-#include "core/block.hpp"
+#include "script/command.hpp"
 
 #include <QApplication>
 #include <QFile>
@@ -14,6 +14,7 @@
 
 #include <array>
 #include <cstdlib>
+#include <sstream>
 
 namespace {
 
@@ -111,13 +112,15 @@ public:
         connect(play, &QPushButton::clicked, this, [this] { playExample(); });
         connect(pause, &QPushButton::clicked, &timer, &QTimer::stop);
         connect(open, &QPushButton::clicked, this, [this] {
-            timer.stop();
             const QString path = QFileDialog::getOpenFileName(
                 this, QStringLiteral("Abrir roteiro"), {},
                 QStringLiteral("Roteiros (*.cmd);;Todos os arquivos (*)"));
-            if (!path.isEmpty() && !loadScript(path)) {
-                QMessageBox::warning(this, QStringLiteral("Erro ao abrir roteiro"),
-                                     QStringLiteral("Não foi possível ler o arquivo."));
+            if (path.isEmpty()) {
+                return;
+            }
+            const QString error = loadScript(path);
+            if (!error.isEmpty()) {
+                QMessageBox::warning(this, QStringLiteral("Erro ao abrir roteiro"), error);
             }
         });
 
@@ -126,7 +129,7 @@ public:
 
     bool runSmokeTest(const QString& path)
     {
-        if (!loadScript(path) ||
+        if (!loadScript(path).isEmpty() ||
             preview.toPlainText().split(QLatin1Char('\n')).value(0) != QStringLiteral("init 32")) {
             return false;
         }
@@ -136,18 +139,29 @@ public:
     }
 
 private:
-    bool loadScript(const QString& path)
+    QString loadScript(const QString& path)
     {
         QFile file(path);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            return false;
+        if (!file.open(QIODevice::ReadOnly)) {
+            return QStringLiteral("Não foi possível abrir o arquivo.");
         }
         const QByteArray contents = file.readAll();
         if (file.error() != QFileDevice::NoError) {
-            return false;
+            return QStringLiteral("Não foi possível ler o arquivo.");
         }
+        std::istringstream input(contents.toStdString());
+        const auto parsed = memsim::script::readVisualScript(input);
+        if (const auto* error = std::get_if<memsim::script::ParseError>(&parsed)) {
+            const QString message = QString::fromStdString(error->message);
+            if (error->source.number != 0) {
+                return QStringLiteral("Linha %1 — %2")
+                    .arg(static_cast<qulonglong>(error->source.number)).arg(message);
+            }
+            return message;
+        }
+        timer.stop();
         preview.setPlainText(QString::fromUtf8(contents));
-        return true;
+        return {};
     }
 
     void playExample()
