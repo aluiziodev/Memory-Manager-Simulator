@@ -17,6 +17,9 @@ if(BUILD_TESTING)
     set_tests_properties(cli_smoke PROPERTIES
         PASS_REGULAR_EXPRESSION "Simulador de gerenciamento de memoria"
     )
+    add_executable(core_tests tests/core_test.cpp)
+    target_link_libraries(core_tests PRIVATE memsim-core)
+    add_test(NAME core_tests COMMAND core_tests)
 endif()
 
 if(MEMSIM_BUILD_VISUAL)
