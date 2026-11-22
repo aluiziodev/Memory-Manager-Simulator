@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iosfwd>
 #include <string>
 #include <string_view>
 #include <variant>
@@ -50,6 +51,10 @@ using CommandResult = std::variant<StepResult, MemoryView, Stats, OperationError
 
 // show e stats são comandos válidos. O filtro visual é aplicado após a análise sintática.
 ParseResult parseLine(std::string_view text, std::size_t line_number);
+// Erros sem linha de origem (entrada vazia ou falha de leitura) usam número 0.
+using VisualScriptResult = std::variant<std::vector<Command>, ParseError>;
+VisualScriptResult readVisualScript(std::istream& input);
+
 // Mutações retornam StepResult. Erros de show/stats retornam OperationError.
 CommandResult execute(MemoryManager& memory, const Command& command);
 
