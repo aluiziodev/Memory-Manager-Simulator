@@ -13,10 +13,10 @@ target_link_libraries(memsim PRIVATE memsim-core)
 
 include(CTest)
 if(BUILD_TESTING)
-    add_test(NAME cli_smoke COMMAND memsim)
-    set_tests_properties(cli_smoke PROPERTIES
-        PASS_REGULAR_EXPRESSION "Simulador de gerenciamento de memoria"
-    )
+    add_test(NAME cli_smoke COMMAND "${CMAKE_COMMAND}"
+        "-DMEMSIM=$<TARGET_FILE:memsim>"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/cli_smoke.cmake")
+    set_tests_properties(cli_smoke PROPERTIES TIMEOUT 5)
     add_executable(core_tests tests/core_test.cpp)
     target_link_libraries(core_tests PRIVATE memsim-core)
     add_test(NAME core_tests COMMAND core_tests)
