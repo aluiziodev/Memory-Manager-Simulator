@@ -111,6 +111,34 @@ ParseResult parseLine(std::string_view text, std::size_t line_number)
     return error("Comando desconhecido.");
 }
 
+CommandResult execute(MemoryManager& memory, const Command& command)
+{
+    if (const auto* init = std::get_if<Init>(&command.args)) {
+        return memory.init(init->size);
+    }
+    if (const auto* alloc = std::get_if<Alloc>(&command.args)) {
+        return memory.alloc(alloc->size, alloc->algorithm);
+    }
+    if (const auto* release = std::get_if<FreeId>(&command.args)) {
+        return memory.freeId(release->id);
+    }
+    if (const auto* release = std::get_if<FreeAddr>(&command.args)) {
+        return memory.freeAddr(release->address);
+    }
+    if (const auto* defrag = std::get_if<Defrag>(&command.args)) {
+        return memory.defrag(defrag->option);
+    }
+
+    const auto stats = memory.getStats();
+    if (const auto* error = std::get_if<OperationError>(&stats)) {
+        return *error;
+    }
+    if (std::holds_alternative<Show>(command.args)) {
+        return MemoryView{memory.getBlocks(), std::get<Stats>(stats)};
+    }
+    return std::get<Stats>(stats);
+}
+
 VisualScriptResult readVisualScript(std::istream& input)
 {
     std::vector<Command> steps;
