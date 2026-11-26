@@ -1,0 +1,17 @@
+name: Linux Qt
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install compiler and Qt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build qt6-base-dev
+      - name: Build and test CLI and Qt offscreen
+        run: bash scripts/build-linux.sh

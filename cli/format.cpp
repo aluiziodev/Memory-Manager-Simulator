@@ -131,7 +131,8 @@ void writeResult(std::ostream& output, const script::Command& command,
             writeError(output, *step.error);
         } else if (const auto* defrag = std::get_if<script::Defrag>(&command.args)) {
             output << "Defrag " << defragName(defrag->option) << ": "
-                   << std::to_string(step.moved.size()) << " blocos movidos, "
+                   << std::to_string(step.moved.size())
+                   << (step.moved.size() == 1 ? " bloco movido, " : " blocos movidos, ")
                    << std::to_string(step.moved_bytes) << " bytes deslocados\n";
         }
     }

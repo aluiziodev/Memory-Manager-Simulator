@@ -67,8 +67,8 @@ int main()
     };
     const DefragCase defrag_cases[] = {
         {"defrag init", "Defrag INIT: 2 blocos movidos, 16 bytes deslocados\n"},
-        {"defrag end", "Defrag END: 1 blocos movidos, 6 bytes deslocados\n"},
-        {"defrag opt", "Defrag OPT: 1 blocos movidos, 6 bytes deslocados\n"},
+        {"defrag end", "Defrag END: 1 bloco movido, 6 bytes deslocados\n"},
+        {"defrag opt", "Defrag OPT: 1 bloco movido, 6 bytes deslocados\n"},
     };
     for (const auto& test : defrag_cases) {
         expect(run(memory, {"init 64", "alloc 10 first", "alloc 8 first", "alloc 6 first",

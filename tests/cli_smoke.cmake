@@ -4,6 +4,7 @@ execute_process(
     OUTPUT_VARIABLE output
     ERROR_VARIABLE diagnostics
     RESULT_VARIABLE status
+    ENCODING UTF-8
 )
 
 set(stats [=[== Estatísticas ==
