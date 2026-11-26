@@ -14,4 +14,4 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake ninja-build qt6-base-dev
       - name: Build and test CLI and Qt offscreen
-        run: bash scripts/build-linux.sh
+        run: bash scripts/build-qt.sh
