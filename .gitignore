@@ -1,9 +1,11 @@
 # Prerequisites
 *.d
 
-#vscode
-
+# Local tools and configuration
 *.vscode/
+/.agents/
+/.aws/
+/.codex/
 
 # Compiled Object files
 *.slo
